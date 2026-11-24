@@ -1,0 +1,4 @@
+const DB = 'punchrush-images', STORE = 'characters'
+const open = () => new Promise<IDBDatabase>((resolve, reject) => { const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error) })
+export async function saveCharacterImage(id: string, image: string) { try { const db=await open(); await new Promise<void>((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(image,id);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)});db.close() } catch { /* localStorage remains a functional fallback */ } }
+export async function deleteCharacterImage(id: string) { try { const db=await open(); db.transaction(STORE,'readwrite').objectStore(STORE).delete(id); db.close() } catch { /* no-op */ } }
